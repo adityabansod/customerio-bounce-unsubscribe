@@ -29,27 +29,26 @@ app.post('/customer-io-webhook', function(req, res) {
     cio.emailId = req.body.data.email_id;
     cio.emailAddress = req.body.data.email_address;
 
+    console.log(cio.eventType);
     if(cio.eventType == 'email_bounced') {
-        console.log(cio.emailAddress + ' has bounced, unsubcribing');
+        console.log(cio.emailAddress + '(' + cio.customerId + ') has bounced, unsubcribing');
         unsubscribe(cio.customerId);
     }
-
-    console.log(cio);
-	res.send();
+    res.send();
 });
 
 // helper function to unsubscribe a user
-function unsubscribe(id) {
+function unsubscribe(id, email) {
     var options = {
         url: 'https://track.customer.io/api/v1/customers/' + id,
         form: {'unsubscribed': 'true'}
     }
 
-    request.put(options, function(err) {
+    request.put(options, function(err, httpResponse, body) {
         if(err) {
-            console.log('errored when trying to unsubscribe ' + id);
+            console.log('errored when trying to unsubscribe ' + id, err);
         } else {
-            console.log('succesfully unsubscribed ' + id);
+            console.log('succesfully unsubscribed ' + email + '(' + id +')');
         }
     });
 }
