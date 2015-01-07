@@ -33,8 +33,8 @@ app.use(bodyparser.json());
 
 app.post('/customer-io-webhook', function(req, res) {
     console.log(req.method + ' request: ' + req.url);
-    var userAgent = req.headers['User-Agent'] || '';
-    if(req.headers['User-Agent'] != null) {
+    var userAgent = req.headers['user-agent'] || '';
+    if(req.headers['user-agent'] != null) {
         if(req.headers['User-Agent'].indexOf('Customer.io') == -1) {
             res.send({'error': 'user agent not customer.io'});
             console.log('request wasnt from customer.io');
