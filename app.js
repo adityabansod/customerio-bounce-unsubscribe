@@ -15,7 +15,6 @@ app.listen(port);
 
 // POST route to handle customer.io webhook
 app.post('/customer-io-webhook', function(req, res) {
-    console.log(req.method + ' request: ' + req.url);
     var userAgent = req.headers['user-agent'] || '';
     if(userAgent.indexOf('Customer.io') == -1 && cioSiteId != '') {
         res.send({'error': 'user agent not customer.io'});
