@@ -29,9 +29,9 @@ app.post('/customer-io-webhook', function(req, res) {
     cio.emailId = req.body.data.email_id;
     cio.emailAddress = req.body.data.email_address;
 
-    console.log(cio.eventType);
+    console.log(cio.eventType + '(' + cio.customerId + ')');
     if(cio.eventType == 'email_bounced') {
-        console.log(cio.emailAddress + '(' + cio.customerId + ') has bounced, unsubcribing');
+        console.log(cio.emailAddress + ' (' + cio.customerId + ') has bounced, unsubcribing');
         unsubscribe(cio.customerId);
     }
     res.send();
@@ -41,14 +41,18 @@ app.post('/customer-io-webhook', function(req, res) {
 function unsubscribe(id, email) {
     var options = {
         url: 'https://track.customer.io/api/v1/customers/' + id,
-        form: {'unsubscribed': 'true'}
+        form: {'unsubscribed': 'true'},
+        auth: {
+            user: cioSiteId,
+            pass: cioSecret
+        }
     }
 
     request.put(options, function(err, httpResponse, body) {
-        if(err) {
+        if(httpResponse.statusCode != 200) {
             console.log('errored when trying to unsubscribe ' + id, err);
         } else {
-            console.log('succesfully unsubscribed ' + email + '(' + id +')');
+            console.log('succesfully unsubscribed ' + email + ' (' + id +')');
         }
     });
 }
