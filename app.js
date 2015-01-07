@@ -1,7 +1,9 @@
 var express = require('express'),
     bodyparser = require('body-parser')
     app = express(),
-    port = process.env.PORT || 5000;
+    port = process.env.PORT || 5000,
+    cioSecret = process.env.CUSTOMER_IO_SECRET || '',
+    cioSiteId = process.env.CUSTOMER_IO_SITE_ID || '';
 app.use(express.compress());
 app.use(bodyparser.json());
 
@@ -31,6 +33,7 @@ app.use(bodyparser.json());
 
 app.post('/customer-io-webhook', function(req, res) {
     console.log(req.method + ' request: ' + req.url);
+    var userAgent = req.headers['User-Agent'] || '';
     if(req.headers['User-Agent'] != null) {
         if(req.headers['User-Agent'].indexOf('Customer.io') == -1) {
             res.send({'error': 'user agent not customer.io'});
@@ -40,13 +43,15 @@ app.post('/customer-io-webhook', function(req, res) {
     }
 
     var cio = {};
-    cio.event_type = req.body.event_type;
-    cio.customer_id = req.body.data.customer_id;
-    cio.email_id = req.body.data.email_id;
-    cio.email_address = req.body.data.email_address;
+    cio.eventType = req.body.event_type;
+    cio.customerId = req.body.data.customer_id;
+    cio.emailId = req.body.data.email_id;
+    cio.emailAddress = req.body.data.email_address;
 
     console.log(cio);
+    console.log(userAgent);
 	res.send();
 });
 app.listen(port);
-console.log('Listening on port ' + port + '...');
+console.log('customer.io bounce unsubscriber starting on ' + port + '...');
+console.log('running in ' + (cioSiteId == '' ? 'test' : 'production') + ' mode');
