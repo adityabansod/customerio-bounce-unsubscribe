@@ -22,11 +22,12 @@ app.post('/customer-io-webhook', function(req, res) {
         return;
     }
 
-    var cio = {};
-    cio.eventType = req.body.event_type;
-    cio.customerId = req.body.data.customer_id;
-    cio.emailId = req.body.data.email_id;
-    cio.emailAddress = req.body.data.email_address;
+    var cio = {
+        eventType: req.body.event_type,
+        customerId: req.body.data.customer_id,
+        emailId: req.body.data.email_id,
+        emailAddress: req.body.data.email_address
+    };
 
     console.log(cio.eventType + ' (' + cio.customerId + ')');
     if(cio.eventType == 'email_bounced') {
@@ -37,7 +38,7 @@ app.post('/customer-io-webhook', function(req, res) {
 });
 
 // helper function to unsubscribe a user
-function unsubscribe(id, email) {
+function unsubscribe(id) {
     var options = {
         url: 'https://track.customer.io/api/v1/customers/' + id,
         form: {'unsubscribed': 'true'},
@@ -45,7 +46,7 @@ function unsubscribe(id, email) {
             user: cioSiteId,
             pass: cioSecret
         }
-    }
+    };
 
     request.put(options, function(err, httpResponse, body) {
         if(httpResponse.statusCode != 200) {
