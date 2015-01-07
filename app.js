@@ -29,7 +29,7 @@ app.post('/customer-io-webhook', function(req, res) {
     cio.emailId = req.body.data.email_id;
     cio.emailAddress = req.body.data.email_address;
 
-    console.log(cio.eventType + '(' + cio.customerId + ')');
+    console.log(cio.eventType + ' (' + cio.customerId + ')');
     if(cio.eventType == 'email_bounced') {
         console.log(cio.emailAddress + ' (' + cio.customerId + ') has bounced, unsubcribing');
         unsubscribe(cio.customerId);
@@ -52,7 +52,7 @@ function unsubscribe(id, email) {
         if(httpResponse.statusCode != 200) {
             console.log('errored when trying to unsubscribe ' + id, err);
         } else {
-            console.log('succesfully unsubscribed ' + email + ' (' + id +')');
+            console.log('succesfully unsubscribed ' + id);
         }
     });
 }
