@@ -1,14 +1,17 @@
 var express = require('express'),
-    bodyparser = require('body-parser')
+    bodyparser = require('body-parser'),
+    request = require('request'),
     app = express(),
     port = process.env.PORT || 5000,
     cioSecret = process.env.CUSTOMER_IO_SECRET || '',
     cioSiteId = process.env.CUSTOMER_IO_SITE_ID || '';
+
+// Set up Express
 app.use(express.compress());
 app.use(bodyparser.json());
-app.listen(port);
 console.log('customer.io bounce unsubscriber starting on ' + port + '...');
 console.log('running in ' + (cioSiteId == '' ? 'test' : 'production') + ' mode');
+app.listen(port);
 
 
 /* https://track.customer.io/api
@@ -46,7 +49,7 @@ curl -i https://track.customer.io/api/v1/customers/5 \
 
 */
 
-
+// POST route to handle customer.io webhook
 app.post('/customer-io-webhook', function(req, res) {
     console.log(req.method + ' request: ' + req.url);
     var userAgent = req.headers['user-agent'] || '';
@@ -64,11 +67,26 @@ app.post('/customer-io-webhook', function(req, res) {
 
     if(cio.eventType == 'email_bounced') {
         console.log(cio.emailAddress + ' has bounced, unsubcribing');
+        unsubscribe(cio.customerId);
     }
 
     console.log(cio);
 	res.send();
 });
 
-function
+// helper function to unsubscribe a user
+function unsubscribe(id) {
+    var options = {
+        url: 'https://track.customer.io/api/v1/customers/' + id,
+        form: {'unsubscribed': 'true'}
+    }
 
+    request.put(options, function(err) {
+        if(err) {
+            console.log('errored when trying to unsubscribe ' + id);
+        } else {
+            console.log('succesfully unsubscribed ' + id);
+        }
+
+    });
+}
