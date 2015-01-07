@@ -7,6 +7,19 @@ var express = require('express'),
 app.use(express.compress());
 app.use(bodyparser.json());
 
+
+/* https://track.customer.io/api
+Definition
+PUT https://track.customer.io/api/v1/customers/{CUSTOMER_ID}
+
+Example request
+curl -i https://track.customer.io/api/v1/customers/5 \
+   -X PUT \
+   -u YOUR-SITE-ID-HERE:YOUR-SECRET-API-KEY-HERE \
+   -d email=customer@example.com \
+ -d name=Bob \
+   -d plan=premium
+   */
 /*
     POST /my_webhook HTTP/1.1
     Accept: 
@@ -34,12 +47,10 @@ app.use(bodyparser.json());
 app.post('/customer-io-webhook', function(req, res) {
     console.log(req.method + ' request: ' + req.url);
     var userAgent = req.headers['user-agent'] || '';
-    if(req.headers['user-agent'] != null) {
-        if(req.headers['User-Agent'].indexOf('Customer.io') == -1) {
-            res.send({'error': 'user agent not customer.io'});
-            console.log('request wasnt from customer.io');
-            return;
-        }
+    if(userAgent.indexOf('Customer.io') == -1 && cioSiteId != '') {
+        res.send({'error': 'user agent not customer.io'});
+        console.log('request wasnt from customer.io');
+        return;
     }
 
     var cio = {};
@@ -47,6 +58,12 @@ app.post('/customer-io-webhook', function(req, res) {
     cio.customerId = req.body.data.customer_id;
     cio.emailId = req.body.data.email_id;
     cio.emailAddress = req.body.data.email_address;
+
+    if(cio.eventType == 'email_bounced') {
+        console.log(cio.emailAddress + ' has bounced, unsubcribing');
+
+
+    }
 
     console.log(cio);
     console.log(userAgent);
