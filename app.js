@@ -30,9 +30,14 @@ app.post('/customer-io-webhook', function(req, res) {
     };
 
     // console.log(cio.eventType + ' (' + cio.customerId + ')');
-    if(cio.eventType == 'email_bounced') {
-        console.log(cio.emailAddress + ' (' + cio.customerId + ') has bounced, unsubcribing');
-        unsubscribe(cio.customerId);
+    switch (cio.eventType) {
+        case 'email_bounced':
+        case 'email_dropped':
+            console.log(cio.emailAddress + ' (' + cio.customerId + ') has ' + cio.eventType + ', unsubscribing');
+            unsubscribe(cio.customerId);
+            break;
+        default:
+            break;
     }
     res.send();
 });
