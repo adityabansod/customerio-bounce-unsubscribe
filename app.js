@@ -29,7 +29,7 @@ app.post('/customer-io-webhook', function(req, res) {
         emailAddress: req.body.data.email_address
     };
 
-    console.log(cio.eventType + ' (' + cio.customerId + ')');
+    // console.log(cio.eventType + ' (' + cio.customerId + ')');
     if(cio.eventType == 'email_bounced') {
         console.log(cio.emailAddress + ' (' + cio.customerId + ') has bounced, unsubcribing');
         unsubscribe(cio.customerId);
